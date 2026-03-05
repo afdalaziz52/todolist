@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login To Do List</title>
-    <link rel="stylesheet" href="src/output.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <script>
 async function handleLogin(e) {
@@ -28,7 +28,7 @@ async function handleLogin(e) {
             localStorage.setItem("user", JSON.stringify(data.user));
 
             // redirect ke halaman utama
-            window.location.href = "index.html";
+            window.location.href = "/";
         } else {
             alert(data.message);
         }
