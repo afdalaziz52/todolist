@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="dist/output.css">
+  <title>Todolist</title>
+</head>
+<body>
+  <div class="container">
+  <header>
+    <div class="label">Produktivitas Harian</div>
+    <h1>TUGAS<span>.</span></h1>
+    <p class="subtitle">// to-do list — tetap fokus, selesaikan satu per satu</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num" id="total-count">0</div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-num" id="done-count">0</div>
+      <div class="stat-label">Selesai</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-num" id="left-count">0</div>
+      <div class="stat-label">Sisa</div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span>PROGRES HARI INI</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <input class="task-input" id="task-input" type="text" placeholder="Tulis tugas baru..." maxlength="120">
+    <select class="category-select" id="cat-select">
+      <option value="work">Kerja</option>
+      <option value="study">Belajar</option>
+      <option value="personal">Pribadi/Keluarga</option>
+      <option value="finance">Keuangan/Tagihan</option>
+      <option value="social">Acara Sosial</option>
+      <option value="other">Lainnya</option>
+    </select>
+    <button class="add-btn" onclick="addTask()">+ Tambah</button>
+  </div>
+
+  <!-- input custom kategori, muncul kalau pilih Lainnya -->
+  <div class="input-area" id="custom-cat-wrap" style="display:none;">
+    <input class="task-input" id="custom-cat-input" type="text" placeholder="Nama kategori..." maxlength="50">
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('semua', this)">Semua</button>
+    <button class="filter-btn" onclick="setFilter('aktif', this)">Aktif</button>
+    <button class="filter-btn" onclick="setFilter('selesai', this)">Selesai</button>
+  </div>
+
+  <div class="task-list" id="task-list"></div>
+  <div class="empty" id="empty-state">
+    <div class="empty-icon">◻</div>
+    <div class="empty-text">Tidak ada tugas di sini.</div>
+  </div>
+
+  <button class="clear-btn" onclick="clearDone()">Hapus semua yang sudah selesai</button>
+</div>
+
+<script src="script.js"></script>
+<script>
+  // tampilkan/sembunyikan input custom kategori
+  document.getElementById("cat-select").addEventListener("change", function() {
+    const wrap = document.getElementById("custom-cat-wrap");
+    wrap.style.display = this.value === "other" ? "block" : "none";
+  });
+</script>
+</body>
+</html>
