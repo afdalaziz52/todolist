@@ -7,7 +7,6 @@ let currentFilter = "semua";
 function getToken() {
     const token = localStorage.getItem("token");
     if (!token) {
-        window.location.href = "login.html";
         return null;
     }
     return token;
@@ -25,7 +24,7 @@ async function loadTasks() {
 
         if (res.status === 401) {
             localStorage.removeItem("token");
-            window.location.href = "login.html";
+            window.location.href = "/login.html";
             return;
         }
 
@@ -223,6 +222,18 @@ function escapeHtml(str) {
 
 // ── Init ────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("Index.html loaded");
+    // Cek apakah ada token sebelum load tasks
+    const token = localStorage.getItem("token");
+    console.log("Token from localStorage:", token ? "exists" : "not found");
+    
+    if (!token) {
+        console.log("No token, redirecting to login...");
+        window.location.href = "/login.html";
+        return;
+    }
+    
+    console.log("Token found, loading tasks...");
     document.getElementById("task-input").addEventListener("keydown", (e) => {
         if (e.key === "Enter") addTask();
     });

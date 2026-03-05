@@ -1,86 +1,124 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todolist</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body>
-  <div class="container">
-  <header>
-    <div class="label">Produktivitas Harian</div>
-    <h1>TUGAS<span>.</span></h1>
-    <p class="subtitle">// to-do list — tetap fokus, selesaikan satu per satu</p>
-  </header>
+<!doctype html>
+<html lang="en" class="h-full bg-gray-800">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login To Do List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <script>
+async function handleLogin(e) {
+    e.preventDefault();
 
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-num" id="total-count">0</div>
-      <div class="stat-label">Total</div>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat">
-      <div class="stat-num" id="done-count">0</div>
-      <div class="stat-label">Selesai</div>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat">
-      <div class="stat-num" id="left-count">0</div>
-      <div class="stat-label">Sisa</div>
-    </div>
-  </div>
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-  <div class="progress-wrap">
-    <div class="progress-info">
-      <span>PROGRES HARI INI</span>
-      <span id="progress-pct">0%</span>
-    </div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progress-fill"></div>
-    </div>
-  </div>
+    console.log("Attempting login...", { email });
 
-  <div class="input-area">
-    <input class="task-input" id="task-input" type="text" placeholder="Tulis tugas baru..." maxlength="120">
-    <select class="category-select" id="cat-select">
-      <option value="work">Kerja</option>
-      <option value="study">Belajar</option>
-      <option value="personal">Pribadi/Keluarga</option>
-      <option value="finance">Keuangan/Tagihan</option>
-      <option value="social">Acara Sosial</option>
-      <option value="other">Lainnya</option>
-    </select>
-    <button class="add-btn" onclick="addTask()">+ Tambah</button>
-  </div>
+    try {
+        const res = await fetch("http://localhost:8080/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
 
-  <!-- input custom kategori, muncul kalau pilih Lainnya -->
-  <div class="input-area" id="custom-cat-wrap" style="display:none;">
-    <input class="task-input" id="custom-cat-input" type="text" placeholder="Nama kategori..." maxlength="50">
-  </div>
+        console.log("Response status:", res.status);
+        const data = await res.json();
+        console.log("Response data:", data);
 
-  <div class="filters">
-    <button class="filter-btn active" onclick="setFilter('semua', this)">Semua</button>
-    <button class="filter-btn" onclick="setFilter('aktif', this)">Aktif</button>
-    <button class="filter-btn" onclick="setFilter('selesai', this)">Selesai</button>
-  </div>
+        if (res.ok) {
+            // simpan token & data user ke localStorage
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
+            console.log("Token saved, redirecting...");
 
-  <div class="task-list" id="task-list"></div>
-  <div class="empty" id="empty-state">
-    <div class="empty-icon">◻</div>
-    <div class="empty-text">Tidak ada tugas di sini.</div>
-  </div>
-
-  <button class="clear-btn" onclick="clearDone()">Hapus semua yang sudah selesai</button>
-</div>
-
-<script src="/static/script.js"></script>
-<script>
-  // tampilkan/sembunyikan input custom kategori
-  document.getElementById("cat-select").addEventListener("change", function() {
-    const wrap = document.getElementById("custom-cat-wrap");
-    wrap.style.display = this.value === "other" ? "block" : "none";
-  });
+            // redirect ke halaman utama dengan delay kecil
+            setTimeout(() => {
+            window.location.href = "http://localhost:8080/dashboard.html";
+            }, 100);
+        } else {
+            alert(data.message);
+        }
+    } catch (err) {
+        console.error("Login error:", err);
+        alert("Gagal konek ke server: " + err.message);
+    }
+}
 </script>
-</body>
+  <body class="h-full">
+    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+      <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+        <h2
+          class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white"
+        >
+          Login To Do List
+        </h2>
+      </div>
+
+      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    <form class="space-y-6" onsubmit="handleLogin(event)">
+          <div>
+            <label for="email" class="block text-sm/6 font-medium text-gray-100"
+              >Email address</label
+            >
+            <div class="mt-2">
+              <input
+                id="email"
+                type="email"
+                name="email"
+                required
+                autocomplete="email"
+                class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between">
+              <label
+                for="password"
+                class="block text-sm/6 font-medium text-gray-100"
+                >Password</label
+              >
+              <div class="text-sm">
+                <a
+                  href="#"
+                  class="font-semibold text-indigo-400 hover:text-indigo-300"
+                  >Lupa password?</a
+                >
+              </div>
+            </div>
+            <div class="mt-2">
+              <input
+                id="password"
+                type="password"
+                name="password"
+                required
+                autocomplete="current-password"
+                class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              class="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+            >
+              Sign in
+            </button>
+          </div>
+        </form>
+
+        <p class="mt-10 text-center text-sm/6 text-gray-400">
+          Belum punya akun?
+          <a
+            href="register.html"
+            class="font-semibold text-indigo-400 hover:text-indigo-300"
+            >Register</a
+          >
+        </p>
+      </div>
+    </div>
+  </body>
 </html>

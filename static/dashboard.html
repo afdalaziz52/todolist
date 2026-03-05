@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todolist</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div class="min-h-screen bg-gray-900 flex flex-col items-center py-10 px-4">
+    <header class="mb-8 text-center">
+      <div class="text-indigo-400 font-semibold text-lg tracking-wide mb-2">Produktivitas Harian</div>
+      <h1 class="text-4xl font-extrabold text-white mb-1">TUGAS<span class="text-indigo-500">.</span></h1>
+      <p class="subtitle text-gray-400 italic">// to-do list — tetap fokus, selesaikan satu per satu</p>
+    </header>
+
+    <div class="flex gap-6 mb-8">
+      <div class="bg-gray-800 rounded-lg px-6 py-4 flex flex-col items-center shadow">
+        <div class="text-2xl font-bold text-indigo-400" id="total-count">0</div>
+        <div class="text-gray-300 text-sm mt-1">Total</div>
+      </div>
+      <div class="w-px bg-gray-700"></div>
+      <div class="bg-gray-800 rounded-lg px-6 py-4 flex flex-col items-center shadow">
+        <div class="text-2xl font-bold text-green-400" id="done-count">0</div>
+        <div class="text-gray-300 text-sm mt-1">Selesai</div>
+      </div>
+      <div class="w-px bg-gray-700"></div>
+      <div class="bg-gray-800 rounded-lg px-6 py-4 flex flex-col items-center shadow">
+        <div class="text-2xl font-bold text-yellow-400" id="left-count">0</div>
+        <div class="text-gray-300 text-sm mt-1">Sisa</div>
+      </div>
+    </div>
+
+    <div class="w-full max-w-xl mb-8">
+      <div class="flex justify-between mb-1">
+        <span class="text-gray-300 text-sm font-medium">PROGRES HARI INI</span>
+        <span class="text-indigo-400 text-sm font-bold" id="progress-pct">0%</span>
+      </div>
+      <div class="h-3 bg-gray-700 rounded-full overflow-hidden">
+        <div class="h-3 bg-indigo-500 rounded-full transition-all duration-300" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="w-full max-w-xl flex gap-2 mb-6">
+      <input class="flex-1 rounded-md bg-gray-800 px-4 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" id="task-input" type="text" placeholder="Tulis tugas baru..." maxlength="120">
+      <select class="rounded-md bg-gray-800 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" id="cat-select">
+        <option value="work">Kerja</option>
+        <option value="study">Belajar</option>
+        <option value="personal">Pribadi/Keluarga</option>
+        <option value="finance">Keuangan/Tagihan</option>
+        <option value="social">Acara Sosial</option>
+        <option value="other">Lainnya</option>
+      </select>
+      <button class="rounded-md bg-indigo-500 px-4 py-2 text-white font-semibold hover:bg-indigo-400 transition" onclick="addTask()">+ Tambah</button>
+    </div>
+
+    <div class="w-full max-w-xl flex gap-2 mb-6 justify-center">
+      <button class="filter-btn active rounded-full px-4 py-1 bg-indigo-700 text-indigo-300 font-semibold hover:bg-indigo-600 transition" onclick="setFilter('semua', this)">Semua</button>
+      <button class="filter-btn rounded-full px-4 py-1 bg-gray-800 text-gray-400 font-semibold hover:bg-indigo-700 hover:text-indigo-300 transition" onclick="setFilter('aktif', this)">Aktif</button>
+      <button class="filter-btn rounded-full px-4 py-1 bg-gray-800 text-gray-400 font-semibold hover:bg-indigo-700 hover:text-indigo-300 transition" onclick="setFilter('selesai', this)">Selesai</button>
+    </div>
+
+    <div class="w-full max-w-xl text-white" id="task-list"></div>
+    <div class="empty w-full max-w-xl flex flex-col items-center py-8" id="empty-state">
+      <div class="empty-icon text-4xl text-white mb-2">◻</div>
+      <div class="empty-text text-white">Tidak ada tugas di sini.</div>
+    </div>
+
+    <button class="clear-btn mt-8 rounded-md bg-red-500 px-4 py-2 text-white font-semibold hover:bg-red-400 transition" onclick="clearDone()">Hapus semua yang sudah selesai</button>
+  </div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>

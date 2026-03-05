@@ -27,13 +27,19 @@ func SetupRoutes() *mux.Router {
     // ─── Static files ───
     fs := http.FileServer(http.Dir("./static"))
     r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs))
-    
+
+    // login = halaman pertama (root)
     r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         http.ServeFile(w, r, "./static/index.html")
     }).Methods("GET")
-    
-    r.HandleFunc("/login.html", func(w http.ResponseWriter, r *http.Request) {
-        http.ServeFile(w, r, "./static/login.html")
+
+    r.HandleFunc("/index.html", func(w http.ResponseWriter, r *http.Request) {
+        http.ServeFile(w, r, "./static/index.html")
+    }).Methods("GET")
+
+    // dashboard = halaman tasks setelah login
+    r.HandleFunc("/dashboard.html", func(w http.ResponseWriter, r *http.Request) {
+        http.ServeFile(w, r, "./static/dashboard.html")
     }).Methods("GET")
 
     // ─── Auth (public, tidak perlu token) ───
