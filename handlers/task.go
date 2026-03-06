@@ -6,15 +6,10 @@ import (
     "strconv"
 
     "github.com/afdalaziz52/to-do-list/config"
+    "github.com/afdalaziz52/to-do-list/helpers"
     "github.com/afdalaziz52/to-do-list/models"
     "github.com/gorilla/mux"
 )
-
-func writeJSON(w http.ResponseWriter, status int, data map[string]any) {
-    w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(status)
-    json.NewEncoder(w).Encode(data)
-}
 
 // GET /tasks
 func GetTasks(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +18,7 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
     rows, err := config.DB.Query(
         "SELECT id, user_id, title, category, custom_category, status, created_at, updated_at FROM tasks WHERE user_id = ?", userID)
     if err != nil {
-        writeJSON(w, 500, map[string]any{"status": "error", "message": "Gagal ambil data"})
+        helpers.WriteJSON(w, 500, map[string]any{"status": "error", "message": "Gagal ambil data"})
         return
     }
     defer rows.Close()
@@ -35,7 +30,7 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
         tasks = append(tasks, t)
     }
 
-    writeJSON(w, 200, map[string]any{"status": "success", "data": tasks})
+    helpers.WriteJSON(w, 200, map[string]any{"status": "success", "data": tasks})
 }
 
 // GET /tasks/{id}
@@ -49,11 +44,11 @@ func GetTaskByID(w http.ResponseWriter, r *http.Request) {
         Scan(&t.ID, &t.UserID, &t.Title, &t.Category, &t.CustomCategory, &t.Status, &t.CreatedAt, &t.UpdatedAt)
 
     if err != nil {
-        writeJSON(w, 404, map[string]any{"status": "error", "message": "Task tidak ditemukan"})
+        helpers.WriteJSON(w, 404, map[string]any{"status": "error", "message": "Task tidak ditemukan"})
         return
     }
 
-    writeJSON(w, 200, map[string]any{"status": "success", "data": t})
+    helpers.WriteJSON(w, 200, map[string]any{"status": "success", "data": t})
 }
 
 // POST /tasks
@@ -62,18 +57,18 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 
     var req models.TaskRequest
     if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        writeJSON(w, 400, map[string]any{"status": "error", "message": "Format tidak valid"})
+        helpers.WriteJSON(w, 400, map[string]any{"status": "error", "message": "Format tidak valid"})
         return
     }
 
     if err := config.Validate.Struct(req); err != nil {
-        writeJSON(w, 400, map[string]any{"status": "error", "message": err.Error()})
+        helpers.WriteJSON(w, 400, map[string]any{"status": "error", "message": err.Error()})
         return
     }
 
     // validasi custom_category
     if req.Category == "other" && req.CustomCategory == nil {
-        writeJSON(w, 400, map[string]any{"status": "error", "message": "Custom category wajib diisi"})
+        helpers.WriteJSON(w, 400, map[string]any{"status": "error", "message": "Custom category wajib diisi"})
         return
     }
     if req.Category != "other" {
@@ -84,12 +79,12 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
         "INSERT INTO tasks (user_id, title, category, custom_category, status) VALUES (?, ?, ?, ?, 'pending')",
         userID, req.Title, req.Category, req.CustomCategory)
     if err != nil {
-        writeJSON(w, 500, map[string]any{"status": "error", "message": "Gagal membuat task"})
+        helpers.WriteJSON(w, 500, map[string]any{"status": "error", "message": "Gagal membuat task"})
         return
     }
 
     id, _ := result.LastInsertId()
-    writeJSON(w, 201, map[string]any{"status": "success", "message": "Task berhasil dibuat", "id": id})
+    helpers.WriteJSON(w, 201, map[string]any{"status": "success", "message": "Task berhasil dibuat", "id": id})
 }
 
 // PATCH /tasks/{id}
@@ -99,17 +94,17 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
 
     var req models.TaskRequest
     if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        writeJSON(w, 400, map[string]any{"status": "error", "message": "Format tidak valid"})
+        helpers.WriteJSON(w, 400, map[string]any{"status": "error", "message": "Format tidak valid"})
         return
     }
 
     if err := config.Validate.Struct(req); err != nil {
-        writeJSON(w, 400, map[string]any{"status": "error", "message": err.Error()})
+        helpers.WriteJSON(w, 400, map[string]any{"status": "error", "message": err.Error()})
         return
     }
 
     if req.Category == "other" && req.CustomCategory == nil {
-        writeJSON(w, 400, map[string]any{"status": "error", "message": "Custom category wajib diisi"})
+        helpers.WriteJSON(w, 400, map[string]any{"status": "error", "message": "Custom category wajib diisi"})
         return
     }
     if req.Category != "other" {
@@ -120,17 +115,17 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
         "UPDATE tasks SET title=?, category=?, custom_category=? WHERE id=? AND user_id=?",
         req.Title, req.Category, req.CustomCategory, id, userID)
     if err != nil {
-        writeJSON(w, 500, map[string]any{"status": "error", "message": "Gagal update task"})
+        helpers.WriteJSON(w, 500, map[string]any{"status": "error", "message": "Gagal update task"})
         return
     }
 
     rows, _ := result.RowsAffected()
     if rows == 0 {
-        writeJSON(w, 404, map[string]any{"status": "error", "message": "Task tidak ditemukan"})
+        helpers.WriteJSON(w, 404, map[string]any{"status": "error", "message": "Task tidak ditemukan"})
         return
     }
 
-    writeJSON(w, 200, map[string]any{"status": "success", "message": "Task berhasil diupdate"})
+    helpers.WriteJSON(w, 200, map[string]any{"status": "success", "message": "Task berhasil diupdate"})
 }
 
 // PATCH /tasks/{id}/status
@@ -142,29 +137,29 @@ func UpdateStatus(w http.ResponseWriter, r *http.Request) {
         Status string `json:"status"`
     }
     if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-        writeJSON(w, 400, map[string]any{"status": "error", "message": "Format tidak valid"})
+        helpers.WriteJSON(w, 400, map[string]any{"status": "error", "message": "Format tidak valid"})
         return
     }
 
     if body.Status != "pending" && body.Status != "done" {
-        writeJSON(w, 400, map[string]any{"status": "error", "message": "Status harus pending atau done"})
+        helpers.WriteJSON(w, 400, map[string]any{"status": "error", "message": "Status harus pending atau done"})
         return
     }
 
     result, err := config.DB.Exec(
         "UPDATE tasks SET status=? WHERE id=? AND user_id=?", body.Status, id, userID)
     if err != nil {
-        writeJSON(w, 500, map[string]any{"status": "error", "message": "Gagal update status"})
+        helpers.WriteJSON(w, 500, map[string]any{"status": "error", "message": "Gagal update status"})
         return
     }
 
     rows, _ := result.RowsAffected()
     if rows == 0 {
-        writeJSON(w, 404, map[string]any{"status": "error", "message": "Task tidak ditemukan"})
+        helpers.WriteJSON(w, 404, map[string]any{"status": "error", "message": "Task tidak ditemukan"})
         return
     }
 
-    writeJSON(w, 200, map[string]any{"status": "success", "message": "Status berhasil diupdate"})
+    helpers.WriteJSON(w, 200, map[string]any{"status": "success", "message": "Status berhasil diupdate"})
 }
 
 // DELETE /tasks/{id}
@@ -175,15 +170,15 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
     result, err := config.DB.Exec(
         "DELETE FROM tasks WHERE id=? AND user_id=?", id, userID)
     if err != nil {
-        writeJSON(w, 500, map[string]any{"status": "error", "message": "Gagal hapus task"})
+        helpers.WriteJSON(w, 500, map[string]any{"status": "error", "message": "Gagal hapus task"})
         return
     }
 
     rows, _ := result.RowsAffected()
     if rows == 0 {
-        writeJSON(w, 404, map[string]any{"status": "error", "message": "Task tidak ditemukan"})
+        helpers.WriteJSON(w, 404, map[string]any{"status": "error", "message": "Task tidak ditemukan"})
         return
     }
 
-    writeJSON(w, 200, map[string]any{"status": "success", "message": "Task berhasil dihapus"})
+    helpers.WriteJSON(w, 200, map[string]any{"status": "success", "message": "Task berhasil dihapus"})
 }

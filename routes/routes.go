@@ -53,6 +53,11 @@ func SetupRoutes() *mux.Router {
 	auth.HandleFunc("/register", handlers.Register).Methods("POST")
 	auth.HandleFunc("/login", handlers.Login).Methods("POST")
 
+	// ─── Auth API (protected) ───
+	authProtected := r.PathPrefix("/api/auth").Subrouter()
+	authProtected.Use(middleware.AuthMiddleware)
+	authProtected.HandleFunc("/change-password", handlers.ChangePassword).Methods("POST")
+
 	// ─── Tasks API (protected, butuh JWT token) ───
 	tasks := r.PathPrefix("/api/tasks").Subrouter()
 	tasks.Use(middleware.AuthMiddleware)

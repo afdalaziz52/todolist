@@ -5,8 +5,8 @@ import (
     "net/http"
     "os"
     "strings"
-	"encoding/json"
 
+    "github.com/afdalaziz52/to-do-list/helpers"
     "github.com/golang-jwt/jwt/v5"
 )
 
@@ -16,14 +16,14 @@ func AuthMiddleware(next http.Handler) http.Handler {
         // ambil header Authorization
         authHeader := r.Header.Get("Authorization")
         if authHeader == "" {
-            writeJSON(w, 401, map[string]any{"status": "error", "message": "Token tidak ada"})
+            helpers.WriteJSON(w, 401, map[string]any{"status": "error", "message": "Token tidak ada"})
             return
         }
 
         // cek format "Bearer <token>"
         parts := strings.Split(authHeader, " ")
         if len(parts) != 2 || parts[0] != "Bearer" {
-            writeJSON(w, 401, map[string]any{"status": "error", "message": "Format token tidak valid"})
+            helpers.WriteJSON(w, 401, map[string]any{"status": "error", "message": "Format token tidak valid"})
             return
         }
 
@@ -38,14 +38,14 @@ func AuthMiddleware(next http.Handler) http.Handler {
         })
 
         if err != nil || !token.Valid {
-            writeJSON(w, 401, map[string]any{"status": "error", "message": "Token tidak valid atau expired"})
+            helpers.WriteJSON(w, 401, map[string]any{"status": "error", "message": "Token tidak valid atau expired"})
             return
         }
 
         // ambil userID dari token
         claims, ok := token.Claims.(jwt.MapClaims)
         if !ok {
-            writeJSON(w, 401, map[string]any{"status": "error", "message": "Token tidak valid"})
+            helpers.WriteJSON(w, 401, map[string]any{"status": "error", "message": "Token tidak valid"})
             return
         }
 
@@ -55,10 +55,4 @@ func AuthMiddleware(next http.Handler) http.Handler {
         ctx := context.WithValue(r.Context(), "userID", userID)
         next.ServeHTTP(w, r.WithContext(ctx))
     })
-}
-
-func writeJSON(w http.ResponseWriter, status int, data map[string]any) {
-    w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(status)
-    json.NewEncoder(w).Encode(data)
 }
